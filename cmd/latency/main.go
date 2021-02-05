@@ -18,6 +18,7 @@ func main() {
 		duration    = flag.Duration("d", 30*time.Second, "benchmark runtime")
 		connections = flag.Uint64("c", 1, "connections")
 		url         = flag.String("url", "", "broker url")
+		topic       = flag.String("topic", "benchmark", "kafka topic")
 	)
 	flag.Parse()
 
@@ -35,7 +36,7 @@ func main() {
 		factory = &requester.KafkaRequesterFactory{
 			URLs:        []string{*url},
 			PayloadSize: *size,
-			Topic:       "benchmark",
+			Topic:       *topic,
 		}
 	default:
 		fmt.Printf("Unknown system '%s'\n", *system)
@@ -47,7 +48,7 @@ func main() {
 func run(factory bench.RequesterFactory, rate, conns uint64, duration time.Duration,
 	output string) {
 
-	benchmark := bench.NewBenchmark(factory, rate, conns, duration)
+	benchmark := bench.NewBenchmark(factory, rate, conns, duration, 0)
 	summary, err := benchmark.Run()
 	if err != nil {
 		panic(err)
